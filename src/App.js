@@ -1,23 +1,19 @@
 import logo from './logo.svg';
 import './App.css';
-
+import {useState} from 'react'
+import Form from './Components/Form'
+import AddData from './Components/AddData'
 function App() {
+  const [show, setShow] = useState(false)
+  const [chng, setChng] = useState(false)
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <button onClick = { () => setShow(!show) }>Click here for Form</button>
+      { show && <Form />}
+      <br />
+      <button onClick = { () => setChng(!chng) }>Click Here fo Add</button>
+      { chng && <AddData /> }
     </div>
   );
 }
