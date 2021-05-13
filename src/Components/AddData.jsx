@@ -1,48 +1,103 @@
-import {useState} from 'react'
+import {useState} from 'react' 
+import shortid from 'shortid';
 
 const AddData = () => {
 
-    const [userName, setUserName] = useState('')
-    const [email, setEmail] = useState('')
+    // const [user, setUser] = useState('')
+    // const [email, setEmail] = useState('')
+    const [user, setUser] = useState({
+        id: shortid.generate(),
+        name: '',
+        email: ''
+
+    })
+    const [newUser, setNewUser] = useState('')
+    const [newEmail, setNewEmail] = useState('')
     const [data, setData] = useState([])
+    const [editableUser, setEdiatableUSer] = useState(null);
+
+    const handleChange = (e) => {
+        setUser({
+            ...user,
+            [e.target.name] : e.target.value
+        })
+    }
 
     const deleteHand = (id) => {
         const newData = [...data]
-        const newArr = newData.filter( (value) => {
-            if ( value.id !== id ) {
-                return value
+        const finalData = newData.filter( (value) => {
+            if ( id !== value.id ) {
+                return value;
             }
-        } ) 
-        setData(newArr)
+        } )
+        setData(finalData)
     }
+    const editHand = (value) => {
+        setNewUser(value.name)
+        setNewEmail(value.email)
+        setEdiatableUSer(value)
+
+    } 
+    const updateHand = (e) => {
+        if(!editableUser) return
+        e.preventDefault()
+        const updatedUser = data.find( (item) => {
+            return item.id === editableUser.id
+        } ) 
+
+        updatedUser.name = newUser
+        updatedUser.email = newEmail
+        setEdiatableUSer(null);
+        setNewUser('');
+        setNewEmail('') 
+    } 
+
     return ( 
         <div>
-            <div>
-                <form action="" onSubmit = { (e) => {
-                    e.preventDefault()
-                    const obj = { userName, email, id : data.length+1}
-                    setData([...data,obj,])
-                    setUserName('')
-                    setEmail('')
-                }}>
-                    <input value = {userName} type="text" onChange = { (e) => { setUserName(e.target.value)}} />
-                    <br />
-                    <input value = {email} className = "in" type="text" onChange = { (e) => {setEmail(e.target.value)}} />
-                    <br />
-                    <button> Add </button>
-                </form>
-            </div>
-            {data.map( (value) => {
-                return (
-                    <div style = {{ border : "1px solid #000000", padding : "20px",margin : "10px 0px" }}>
-                        <h2>{value.userName}</h2>
-                        <h3>{value.email}</h3>
-                        <h2>{value.id}</h2>
-                        <button onClick = { () => deleteHand(value.id) }>Delete</button>
-                    </div>
-                )
-            })}
+            <form action="" onSubmit = { (e) => {
+                e.preventDefault()
+                
+                setData([...data, user])
+                setUser({
+                    id: shortid.generate(),
+                    name: '',
+                    email: ''
+                })
+            }}>
+                <input value = {user.name} name = 'name' type="text" onChange = { (e) => handleChange(e)}/>
+                <br />
+                <input value = {user.email} name = 'email' type="text" onChange = { (e) =>  handleChange(e) }/>
+                <br />
+                <button>Add data </button>
+            </form>
 
+            <h2>UpdateBox</h2>
+            <form action="" onSubmit = { (e) => updateHand(e)}>
+                <input value = {newUser} type="text" onChange = { (e) => {
+                    setNewUser(e.target.value)
+                } }/>
+                <br />
+                <input value = {newEmail} type="text" onChange = { (e) => {
+                    setNewEmail(e.target.value)
+                } }/>
+                <br />
+                <button type = 'submit'>Update</button>
+            </form>
+
+            
+            <div>
+                {data.map( (value) => {
+                    return (
+                        <div>
+                            <h2>{ value.name }</h2>
+                            <h3>{ value.email }</h3>
+                            <h2>{ value.id }</h2>
+                            <button onClick = { () => deleteHand(value.id) }>Delete</button>
+                            <button onClick = { () => editHand(value) }>Edit</button>
+                        </div>
+                    )
+                } )}
+            </div>
         </div>
      );
 }
