@@ -1,105 +1,102 @@
+import { Update } from '@material-ui/icons';
 import {useState} from 'react' 
 import shortid from 'shortid';
 
-const AddData = () => {
-
-    // const [user, setUser] = useState('')
-    // const [email, setEmail] = useState('')
-    const [user, setUser] = useState({
-        id: shortid.generate(),
-        name: '',
-        email: ''
-
+const AddData = () => { 
+    const [users, setUsers] = useState({
+        user : '',
+        email : '',
+        id : shortid.generate()
     })
-    const [newUser, setNewUser] = useState('')
-    const [newEmail, setNewEmail] = useState('')
-    const [data, setData] = useState([])
-    const [editableUser, setEdiatableUSer] = useState(null);
+    const [datas, setDatas] = useState([])
+    const [editmode, setEditmode] = useState(false)
+    const [nothing, setNothing] = useState(null)
 
     const handleChange = (e) => {
-        setUser({
-            ...user,
+        setUsers({
+            ...users,
             [e.target.name] : e.target.value
         })
     }
-
+    const Update = (e) => {
+        e.preventDefault()
+        setDatas([...datas, users])
+        setUsers({
+            user : '',
+            email : '',
+            id : shortid.generate()
+        })
+    }
     const deleteHand = (id) => {
-        const newData = [...data]
-        const finalData = newData.filter( (value) => {
-            if ( id !== value.id ) {
-                return value;
-            }
+        const deleteData = [...datas]
+        const newDatas = deleteData.filter( (value) => {
+            if (value.id !== id)
+                return value
         } )
-        setData(finalData)
+        setDatas(newDatas)
     }
     const editHand = (value) => {
-        setNewUser(value.name)
-        setNewEmail(value.email)
-        setEdiatableUSer(value)
-
-    } 
-    const updateHand = (e) => {
-        if(!editableUser) return
+        setUsers({
+            id: value.id,
+            user: value.user,
+            email: value.email
+        })
+        setNothing(value)
+        setEditmode(true)
+    }
+    const upadeted = (e) => {
         e.preventDefault()
-        const updatedUser = data.find( (item) => {
-            return item.id === editableUser.id
-        } ) 
+        if(!nothing) return
+        const updatedData = datas.find( (item) => {
+            return nothing.id === item.id
+        } )
+        updatedData.user = users.user
+        updatedData.email = users.email
+        setNothing(null)
+        setEditmode(false)
+        
+        setUsers({
+            id: shortid.generate(),
+            user: '',
+            email: '',
+        })
+    }
+    
 
-        updatedUser.name = newUser
-        updatedUser.email = newEmail
-        setEdiatableUSer(null);
-        setNewUser('');
-        setNewEmail('') 
-    } 
-
-    return ( 
+     return (
         <div>
-            <form action="" onSubmit = { (e) => {
-                e.preventDefault()
-                
-                setData([...data, user])
-                setUser({
-                    id: shortid.generate(),
-                    name: '',
-                    email: ''
-                })
-            }}>
-                <input value = {user.name} name = 'name' type="text" onChange = { (e) => handleChange(e)}/>
+            <form action="" onSubmit = { editmode ? upadeted : Update  }>
+                <input type="text" name = "user" value = {users.user} onChange = { (e) => handleChange(e) } />
                 <br />
-                <input value = {user.email} name = 'email' type="text" onChange = { (e) =>  handleChange(e) }/>
+                <input type="text" name = "email" value = {users.email} onChange = { (e) => handleChange(e) }/>
                 <br />
-                <button>Add data </button>
+                <button>{editmode ? 'Update Data' : 'Add Data' }</button>
             </form>
-
-            <h2>UpdateBox</h2>
-            <form action="" onSubmit = { (e) => updateHand(e)}>
-                <input value = {newUser} type="text" onChange = { (e) => {
-                    setNewUser(e.target.value)
-                } }/>
-                <br />
-                <input value = {newEmail} type="text" onChange = { (e) => {
-                    setNewEmail(e.target.value)
-                } }/>
-                <br />
-                <button type = 'submit'>Update</button>
-            </form>
-
             
+            {/* <form action="" onSubmit = { (e) => upadeted(e) }>
+                <input type="text" value = { newUser } onChange = { (e) => setNewUser(e.target.value) }/>
+                <br />
+                <input type="text" value = { newEmail } onChange = { (e) => setNewEmail(e.target.value) }/>
+                <br />
+                <button>Add data</button>
+            </form> */}
             <div>
-                {data.map( (value) => {
+                {datas.map( (value) => {
                     return (
                         <div>
-                            <h2>{ value.name }</h2>
-                            <h3>{ value.email }</h3>
-                            <h2>{ value.id }</h2>
+                            <h1>{value.id}</h1>
+                            <h2>{value.user}</h2>
+                            <h4>{value.email}</h4>
                             <button onClick = { () => deleteHand(value.id) }>Delete</button>
                             <button onClick = { () => editHand(value) }>Edit</button>
                         </div>
                     )
                 } )}
             </div>
+
         </div>
-     );
+        
+    )
 }
- 
+
 export default AddData;
